@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"       # AMQP
+      - "15672:15672"     # Management UI → open http://localhost:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  ccaservice:
+    build:
+      context: ./shoppingcart/ccaservice
+      dockerfile: Dockerfile
+    container_name: ccaservice
+    ports:
+      - "8080:8080"
+    # No env vars needed - CCA has no external dependencies
+
+  scs-service:
+    build:
+      context: ./shoppingcart/scs-service
+      dockerfile: Dockerfile
+    container_name: scs-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      ccaservice:
+        condition: service_started
+    environment:
+      CCA_BASE_URL: http://ccaservice:8080
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+      RMQ_USER: guest
+      RMQ_PASS: guest
+      RMQ_QUEUE: orders_queue
+
+  warehouse-consumer:
+    build:
+      context: ./warehouse-consumer
+      dockerfile: Dockerfile
+    container_name: warehouse-consumer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      QUEUE_NAME: orders_queue
+      NUM_CONSUMER_THREADS: 10
+      PREFETCH_COUNT: 10
+      RABBITMQ_RETRY_COUNT: 30
+      RABBITMQ_RETRY_WAIT_S: 2
+    restart: unless-stopped

@@ -1,0 +1,6 @@
+aws_region          = "us-west-2"
+service_name        = "cca-service"
+cluster_name        = "cs6650-assignment3-cluster"
+ecr_repository_name = "ccaservice"
+task_cpu            = "256"
+task_memory         = "512"

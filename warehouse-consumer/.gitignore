@@ -1,0 +1,8 @@
+target/
+.idea/
+.DS_Store
+*.iml
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
