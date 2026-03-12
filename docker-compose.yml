@@ -1,0 +1,43 @@
+version: "3.9"
+# Local cluster: 1 leader + 4 followers
+# Change WRITE_QUORUM_SIZE / READ_QUORUM_SIZE on the leader to switch configurations
+
+services:
+  follower1:
+    build: .
+    environment: { ROLE: follower }
+    ports: ["8081:8080"]
+    networks: [kvnet]
+
+  follower2:
+    build: .
+    environment: { ROLE: follower }
+    ports: ["8082:8080"]
+    networks: [kvnet]
+
+  follower3:
+    build: .
+    environment: { ROLE: follower }
+    ports: ["8083:8080"]
+    networks: [kvnet]
+
+  follower4:
+    build: .
+    environment: { ROLE: follower }
+    ports: ["8084:8080"]
+    networks: [kvnet]
+
+  leader:
+    build: .
+    environment:
+      ROLE: leader
+      FOLLOWER_URLS: "http://follower1:8080,http://follower2:8080,http://follower3:8080,http://follower4:8080"
+      WRITE_QUORUM_SIZE: "5"
+      READ_QUORUM_SIZE: "1"
+    ports: ["8080:8080"]
+    depends_on: [follower1, follower2, follower3, follower4]
+    networks: [kvnet]
+
+networks:
+  kvnet:
+    driver: bridge
