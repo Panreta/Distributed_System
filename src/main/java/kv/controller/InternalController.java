@@ -2,7 +2,7 @@ package kv.controller;
 
 
 import kv.model.ReadResponse;
-import kv.model.WriteRequest;
+import kv.model.WriteResponse;
 import kv.service.KVService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class InternalController {
     public InternalController(KVService kvService) { this.kvService = kvService; }
 
     @PutMapping
-    public ResponseEntity<Void> replicatePut(@RequestBody WriteRequest request) {
+    public ResponseEntity<Void> replicatePut(@RequestBody WriteResponse request) {
         kvService.applyReplication(request.getKey(), request.getValue(), request.getVersion());
         return ResponseEntity.ok().build();
     }

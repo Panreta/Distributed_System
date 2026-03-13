@@ -5,7 +5,6 @@ import kv.config.NodeConfig;
 import kv.model.KVEntry;
 import kv.model.ReadResponse;
 import kv.model.WriteRequest;
-import kv.model.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,7 @@ public class KVService {
     // Client write — must only be called on the leader
     // ------------------------------------------------------------------
 
-    public WriteResponse write(String key, String value) {
+    public WriteRequest write(String key, String value) {
         if (!config.isLeader()) {
             throw new IllegalStateException("Writes must go to the leader node");
         }
@@ -68,7 +67,7 @@ public class KVService {
         store.put(entry);
 
         log.info("Write done: key='{}' v={} W={}", key, version, config.getWriteQuorum());
-        return new WriteResponse(key, version);
+        return new WriteRequest(key, version);
     }
 
     // ------------------------------------------------------------------

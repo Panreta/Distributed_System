@@ -1,18 +1,15 @@
 package kv.model;
 
-
 /** Request body for PUT /kv and internal replication calls. */
-public class WriteRequest extends KVBase {
+public class WriteRequest {
     private String key;
-    private String value;
-    private int version; // set by leader before propagating
+    private int version;
 
     public WriteRequest() {}
-    public WriteRequest(String key, String value, int version) {
-        super(key, value); this.version = version;
-    }
+    public WriteRequest(String key, int version) { this.key = key; this.version = version; }
 
-
+    public String getKey() { return key; }
+    public void setKey(String key) { this.key = key; }
     public int getVersion() { return version; }
     public void setVersion(int version) { this.version = version; }
 }

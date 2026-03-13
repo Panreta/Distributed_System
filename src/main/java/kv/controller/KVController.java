@@ -2,8 +2,8 @@ package kv.controller;
 
 
 import kv.model.ReadResponse;
-import kv.model.WriteRequest;
 import kv.model.WriteResponse;
+import kv.model.WriteRequest;
 import kv.service.KVService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +27,11 @@ public class KVController {
     public KVController(KVService kvService) { this.kvService = kvService; }
 
     @PutMapping
-    public ResponseEntity<?> put(@RequestBody WriteRequest request) {
+    public ResponseEntity<?> put(@RequestBody WriteResponse request) {
         if (request.getKey() == null || request.getKey().isEmpty()) {
             return ResponseEntity.badRequest().body("key must not be empty");
         }
-        WriteResponse response = kvService.write(request.getKey(), request.getValue());
+        WriteRequest response = kvService.write(request.getKey(), request.getValue());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
